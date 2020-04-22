@@ -1,36 +1,36 @@
-import React, { useState } from 'react'
-import { View } from 'native-base'
-import { Text, Image, TouchableOpacity } from 'react-native'
+import React, { useState } from "react"
+import { View } from "native-base"
+import { Text, Image, TouchableOpacity } from "react-native"
 
-import ButtonComp from '../../Components/Button'
+import ButtonComp from "../../Components/Button"
 
 const Greetings = ({ navigation }) => {
   return (
     <View
       style={{
-        backgroundColor: 'white',
+        backgroundColor: "white",
         flex: 1,
-        justifyContent: 'space-evenly',
+        justifyContent: "space-evenly",
         paddingHorizontal: 20
       }}
     >
       <View>
-        <Text style={{ fontSize: 32, fontFamily: 'OpenSans-Italic' }}>
+        <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
           Quick
         </Text>
-        <Text style={{ fontSize: 32, fontFamily: 'OpenSans-Italic' }}>
+        <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
           and easy
         </Text>
       </View>
       <View>
         <Image
-          source={require('../../Assets/Images/chat.png')}
+          source={require("../../Assets/Images/chat.png")}
           style={{ width: 320, height: 280 }}
-          resizeMode='contain'
-          containerStyle={{ backgroundColor: 'red' }}
+          resizeMode="contain"
+          containerStyle={{ backgroundColor: "red" }}
         />
         <Text
-          style={{ fontSize: 32, fontFamily: 'Roboto', textAlign: 'center' }}
+          style={{ fontSize: 32, fontFamily: "Roboto", textAlign: "center" }}
         >
           Iog App
         </Text>
@@ -39,22 +39,22 @@ const Greetings = ({ navigation }) => {
       <View>
         <TouchableOpacity>
           <ButtonComp
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate("Login")}
             containerStyle={{
-              alignItems: 'center'
+              alignItems: "center"
             }}
-            title='Take me in'
+            title="Take me in"
             style={{
-              width: '80%',
+              width: "80%",
               borderRadius: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#189A8A'
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#189A8A"
             }}
             textStyle={{
               fontSize: 16,
-              fontFamily: 'Roboto',
-              color: 'white'
+              fontFamily: "Roboto",
+              color: "white"
             }}
           />
         </TouchableOpacity>

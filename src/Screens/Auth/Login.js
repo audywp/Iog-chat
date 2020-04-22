@@ -5,13 +5,18 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 class Login extends Component {
   constructor (props) {
-    super(props)
-
+    super(props);
+    
+    this.onGoHome = this.onGoHome.bind(this);
     this.onPressFlag = this.onPressFlag.bind(this)
     this.selectCountry = this.selectCountry.bind(this)
     this.state = {
       pickerData: null
     }
+  }
+
+  onGoHome() {
+    this.props.navigation.navigate('Home')
   }
 
   onPressFlag () {
@@ -40,9 +45,7 @@ class Login extends Component {
             <Text
               style={{
                 position: 'absolute',
-                left: 15,
-                color: '#444',
-                fontSize: 18
+                left: 15
               }}
             >
               +62 :
@@ -50,22 +53,22 @@ class Login extends Component {
             <TextInput
               keyboardType='phone-pad'
               dataDetectorTypes='phoneNumber'
-              maxLength={12}
+              maxLength={11}
               placeholder='Phone Number'
-              placeholderTextColor='#444'
+              placeholderTextColor='#333'
               style={{
-                fontSize: 18,
-                paddingHorizontal: 52,
+                paddingHorizontal: 50,
                 borderRadius: 8,
                 borderBottomWidth: 2,
                 borderColor: '#189A8A',
                 width: 230,
-                height: 50,
+                height: 40,
                 marginLeft: 5
               }}
             />
           </View>
           <Button
+            onPress={this.onGoHome}
             title='Continue'
             containerStyle={{
               justifyContent: 'center',
@@ -75,8 +78,7 @@ class Login extends Component {
             style={{
               width: 250,
               backgroundColor: '#189A8A',
-              borderRadius: 20,
-              fontSize: 18
+              borderRadius: 20
             }}
             textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
           />
