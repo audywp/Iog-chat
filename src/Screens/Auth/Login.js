@@ -1,30 +1,71 @@
 import React, { Component } from 'react'
-import { View, Text, Image, SafeAreaView, StyleSheet, TextInput } from 'react-native'
+import { View, Text, Image, SafeAreaView, StyleSheet, TextInput, Alert, AsyncStorage } from 'react-native'
 import Button from '../../Components/Button'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import auth from '@react-native-firebase/auth'
+import { Content, Spinner } from 'native-base'
 
 class Login extends Component {
   constructor (props) {
     super(props);
-    
-    this.onGoHome = this.onGoHome.bind(this);
-    this.onPressFlag = this.onPressFlag.bind(this)
-    this.selectCountry = this.selectCountry.bind(this)
     this.state = {
-      pickerData: null
+      user: null,
+      message: '',
+      phoneNumb: '',
+      confirm: null,
+      code: '',
+      content: 'Continue'
     }
   }
 
-  onGoHome() {
-    this.props.navigation.navigate('Home')
+  componentDidMount () {
+    this.unsubscribe = auth().onAuthStateChanged(user => {
+      console.log(this.unsubscribe)
+      if (user) {
+        this.setState({
+          user: user.toJSON()
+        })
+        console.log(user)
+      } else {
+        this.setState({
+          user: null,
+          message: '',
+          phoneNumb: '',
+          confirm: null,
+          code: '',
+          content: 'Continue'
+        })
+      }
+    })
   }
 
-  onPressFlag () {
-    this.myCountryPicker.open()
+  componentWillUnmount () {
+    if (this.unsubscribe) {
+      this.unsubscribe()
+    }
   }
 
-  selectCountry () {
-    this.phone.selectCountry(country.iso2)
+  onLogin = async () => {
+    const { phoneNumb, confirm } = this.state
+
+    this.setState({
+      message: 'sending code ...'
+    })
+
+    const res = await auth().signInWithPhoneNumber(phoneNumb)
+    try {
+      if (res) {
+        this.setState({
+          confirm: res,
+          message: 'code has been send !',
+        })
+        this.props.navigation.navigate('OTP', { data: res, phone: phoneNumb })
+      } else {
+        Alert.alert('your phone number is not valid')
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   render () {
@@ -56,6 +97,7 @@ class Login extends Component {
               maxLength={11}
               placeholder='Phone Number'
               placeholderTextColor='#333'
+              onChangeText={ phone => this.setState({ phoneNumb: `+62${phone}` })}
               style={{
                 paddingHorizontal: 50,
                 borderRadius: 8,
@@ -68,8 +110,8 @@ class Login extends Component {
             />
           </View>
           <Button
-            onPress={this.onGoHome}
-            title='Continue'
+            onPress={() => this.onLogin(this.state.phoneNumb)}
+            title={this.state.content}
             containerStyle={{
               justifyContent: 'center',
               alignItems: 'center',
@@ -82,6 +124,15 @@ class Login extends Component {
             }}
             textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
           />
+          
+          <Text style= {{ marginTop: 10, marginBottom: 5 }}>
+            Didn't have account ?
+          </Text>
+          <TouchableOpacity onPress={()=> this.props.navigation.navigate('Register')}>
+          <Text style= {{ color: '#189A8A' }}>
+            Register
+          </Text>
+          </TouchableOpacity>
         </View>
         <View />
       </ScrollView>
