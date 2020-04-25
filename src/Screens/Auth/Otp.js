@@ -1,34 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, Alert, ScrollView } from 'react-native';
 import ButtonSend from '../../Components/Button';
 import OtpInputs from 'react-native-otp-inputs';
 import { setLogin } from '../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
+import auth from '@react-native-firebase/auth'
 
 function OneTimePassword(props) {
-  const [verificationCode, setCode] = useState([]);
+  const [code, setCode] = useState([]);
+  console.log(code)
   async function onConfirm (verificationCode) {
     const { data, phone } = props.route.params
     if (data) {
      const user =  props.setLogin(verificationCode,data)
      if (user) {
-       props.navigation.navigate('Home', { data: phone })
+      //  props.navigation.navigate('Home', { data: phone })
      } else {
        console.log('fail')
      }
     } else {
       console.log('failed')
     }
+    console.log(code)
   }
+
+  // async function onReset () {
+  //   const user = auth().currentUser.delete()
+  //   .then(()=>{
+  //     Alert.alert('user has been delete')
+      
+  //   })
+  //   .catch(error=>{
+  //     console.log(error, user)
+  //   })
+  // }
+  
   return (
     <ImageBackground
-      source={require('../../Assets/Images/background.jpg')}
-      resizeMode="cover"
-      style={{
-        flex: 1,
-        alignItems: 'center'
+    source={require('../../Assets/Images/background.jpg')}
+    resizeMode="cover"
+    style={{
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 60
       }}
-    >
+      >
+      <ScrollView>
       <View
         style={{
           flex: 1,
@@ -77,6 +94,7 @@ function OneTimePassword(props) {
             >
               
               <OtpInputs
+                handleChange={text=>setCode(text)}
                 inputContainerStyles={{
                   borderColor: 'white',
                   borderBottomWidth: 2,
@@ -101,7 +119,7 @@ function OneTimePassword(props) {
       >
         <TouchableOpacity>
           <ButtonSend
-            onPress={() => onConfirm('123456')}
+            onPress={() => onConfirm(code)}
             title="Send"
             containerStyle={{
               justifyContent: 'center',
@@ -111,7 +129,8 @@ function OneTimePassword(props) {
             style={{
               width: 250,
               backgroundColor: '#189A8A',
-              borderRadius: 20
+              borderRadius: 20,
+              marginTop: 40
             }}
             textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
           />
@@ -137,6 +156,7 @@ function OneTimePassword(props) {
           > Send again </Text>
         </View>
       </View>
+    </ScrollView>
     </ImageBackground>
   );
 }

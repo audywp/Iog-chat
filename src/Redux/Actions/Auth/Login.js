@@ -16,3 +16,14 @@ export const setLogin = (code, data) => async dispatch => {
     console.log(error)
   }
 }
+
+export const hasLogin = () => async dispatch => {
+  await auth().onAuthStateChanged(user => {
+    if (user) {
+      dispatch ({
+        type: 'HAS_LOGIN',
+        payload: user
+      })
+    }
+  })
+}

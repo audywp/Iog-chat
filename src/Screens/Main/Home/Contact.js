@@ -8,10 +8,6 @@ export default class Contact extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <HeaderProf
-          source={require('../../../Assets/Images/person1.jpg')}
-          title='Contact'
-        />
         <ScrollView style={styles.container}>
           <TouchableOpacity style={styles.chatContainer}>
             <View style={{ justifyContent: 'center' }}>

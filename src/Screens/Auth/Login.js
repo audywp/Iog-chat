@@ -3,7 +3,8 @@ import { View, Text, Image, SafeAreaView, StyleSheet, TextInput, Alert, AsyncSto
 import Button from '../../Components/Button'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import auth from '@react-native-firebase/auth'
-import { Content, Spinner } from 'native-base'
+import { connect } from 'react-redux'
+import { hasLogin } from '../../Redux/Actions/Auth/Login'
 
 class Login extends Component {
   constructor (props) {
@@ -25,7 +26,6 @@ class Login extends Component {
         this.setState({
           user: user.toJSON()
         })
-        console.log(user)
       } else {
         this.setState({
           user: null,
@@ -60,6 +60,7 @@ class Login extends Component {
           message: 'code has been send !',
         })
         this.props.navigation.navigate('OTP', { data: res, phone: phoneNumb })
+        console.log(res)
       } else {
         Alert.alert('your phone number is not valid')
       }
@@ -140,7 +141,17 @@ class Login extends Component {
   }
 }
 
-export default Login
+const mapStateToProps = (state) => ({
+  
+    login: state.isLogin
+  
+})
+
+const mapDispatchToProps = {
+  hasLogin
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (Login)
 
 const styles = StyleSheet.create({
   bottomContainer: {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import {
   Thumbnail,
   Header as Endas,
@@ -10,7 +10,7 @@ import {
   Body,
   Button,
 } from 'native-base';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 class Header extends Component {
   constructor(props) {
@@ -33,12 +33,12 @@ class Header extends Component {
           <Title>{this.props.title}</Title>
         </Body>
         <Right>
-          <Button
-            onPress={this.isLogout}
+          <TouchableOpacity
+            onPress={this.props.onpress}
             transparent
           >
-            <AntDesign color={'white'} size={20} name="plus" />
-          </Button>
+            <MaterialCommunityIcons color={'white'} size={20} name="dots-vertical" />
+          </TouchableOpacity>
         </Right>
       </Endas>
     );
