@@ -27,3 +27,14 @@ export const hasLogin = () => async dispatch => {
     }
   })
 }
+
+export const hasLogout = () => async dispatch => {
+    try {
+     dispatch({
+       type:'LOGOUT'
+     }) 
+     Alert.alert('Thanks, please comeback later')
+    } catch (error) {
+      console.log(error)
+    }
+}

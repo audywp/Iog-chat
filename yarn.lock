@@ -1065,6 +1065,11 @@
     eslint-plugin-react-native "3.6.0"
     prettier "1.16.4"
 
+"@react-native-community/geolocation@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@react-native-community/geolocation/-/geolocation-2.0.2.tgz#ba8b40f560ead8d014740d1cdea970b33f19312e"
+  integrity sha512-tTNXRCgnhJBu79mulQwzabXRpDqfh/uaDqfHVpvF0nX4NTpolpy6mvTRiFg7eWFPGRArsnZz1EYp6rHfJWGgEA==
+
 "@react-native-community/masked-view@^0.1.9":
   version "0.1.10"
   resolved "https://registry.yarnpkg.com/@react-native-community/masked-view/-/masked-view-0.1.10.tgz#5dda643e19e587793bc2034dd9bf7398ad43d401"
@@ -1093,6 +1098,11 @@
   version "6.7.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/database/-/database-6.7.1.tgz#6bdbdfdc378d1c8f3a3f01a0fff0dfeccc1345a0"
   integrity sha512-kZ+Zr89E+s9nL1FkF+rzlah0uRjd2iAodmGkOzBmWhc937zpFe+lwxKPGykq6PeOFSMMPfKhOBefCjIb3aZUmQ==
+
+"@react-native-firebase/firestore@^6.7.1":
+  version "6.7.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/firestore/-/firestore-6.7.1.tgz#f0ccf73b51d73b31e7c9b8896979fa9a129583e3"
+  integrity sha512-hODzL694Ar/ao8EAW6QNbYJsqJXyaV7Qzku7TlJop2kIIs+UVzTcSGfnkfrTSJ2wW0ka6sM45asxmfuLkyz0eA==
 
 "@react-native-firebase/messaging@^6.7.1":
   version "6.7.1"

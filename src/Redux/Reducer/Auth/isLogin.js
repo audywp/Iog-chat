@@ -13,7 +13,13 @@ export default function isLogin (state= initalState, action) {
         isLoading: true,
         data: action.payload
       }
-  
+    case 'LOGOUT':
+      return {
+        ...state,
+        isLogged: false,
+        isLoading: true,
+        data: {}
+      }
     default:
       return{
         ...state

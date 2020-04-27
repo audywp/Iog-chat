@@ -1,15 +1,15 @@
 const initalState = {
+  data: [],
   isLoading: false,
-  isRegisted: false
 }
 
 export default function Register (state= initalState, action) {
   switch (action.type) {
-    case 'IS_REGISTER':
+    case 'ADD_CONTACT':
       return {
         ...state,
         isLoading: true,
-        isRegisted: true,
+        data: action.payload
       }
   
     default:

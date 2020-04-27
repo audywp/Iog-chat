@@ -35,16 +35,16 @@ const BottomStack = props => {
         onpress={Profile}
       />
       <BottomTabs.Navigator>
-        <BottomTabs.Screen name="Chat" component={ChatScreen} options={{
-          tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
-          tabBarIcon: ({color, size}) => (
-            <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
-          )
-        }} />
         <BottomTabs.Screen name="Contact" component={Contact} options={{
           tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
           tabBarIcon: ({color, size}) => (
             <AntDesign name='contacts' size={25} color='#189A8A' />
+            )
+          }} />
+        <BottomTabs.Screen name="Chat" component={ChatScreen} options={{
+          tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
+          tabBarIcon: ({color, size}) => (
+            <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
           )
         }} />
       </BottomTabs.Navigator>
@@ -54,16 +54,17 @@ const BottomStack = props => {
 
 const mapStateToProps = state => {
   return {
-    login: state.isLogin
+    login: state.isLogin,
+    register: state.Register
   }
 }
 export default connect(mapStateToProps, { setLogin })(class StackNav extends Component {
 
   render() {
-    const { login } = this.props
+    const { login, register } = this.props
     if (login.isLogged) {
-      return (
-        <Stack.Navigator>
+        return (
+          <Stack.Navigator>
           <Stack.Screen
             name="Home"
             component={BottomStack}
@@ -71,12 +72,12 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
               headerShown: false
             }}
           />
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-          />
-        </Stack.Navigator>
-      )
+            <Stack.Screen
+              name="Profile"
+              component={Profile}
+            />
+          </Stack.Navigator>
+        )
     } else {
       return (
         <Stack.Navigator>

@@ -5,6 +5,7 @@ import OtpInputs from 'react-native-otp-inputs';
 import { setLogin } from '../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
 import auth from '@react-native-firebase/auth'
+import { Spinner } from 'native-base';
 
 function OneTimePassword(props) {
   const [code, setCode] = useState([]);
@@ -12,12 +13,7 @@ function OneTimePassword(props) {
   async function onConfirm (verificationCode) {
     const { data, phone } = props.route.params
     if (data) {
-     const user =  props.setLogin(verificationCode,data)
-     if (user) {
-      //  props.navigation.navigate('Home', { data: phone })
-     } else {
-       console.log('fail')
-     }
+     props.setLogin(verificationCode,data)
     } else {
       console.log('failed')
     }
@@ -117,7 +113,14 @@ function OneTimePassword(props) {
           flex: 1
         }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: 250,
+            backgroundColor: '#189A8A',
+            borderRadius: 20,
+            marginTop: 40
+          }}
+        >
           <ButtonSend
             onPress={() => onConfirm(code)}
             title="Send"
@@ -125,12 +128,6 @@ function OneTimePassword(props) {
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 20
-            }}
-            style={{
-              width: 250,
-              backgroundColor: '#189A8A',
-              borderRadius: 20,
-              marginTop: 40
             }}
             textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
           />

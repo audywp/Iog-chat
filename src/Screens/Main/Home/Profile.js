@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-import { Text, View, ScrollView, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal } from 'react-native'
-
+import { Text, View, ScrollView, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ImageEditor } from 'react-native'
+import imagePicker from 'react-native-image-picker'
 import ButtonSignout from '../../../Components/Button'
 
-import { setLogin } from '../../../Redux/Actions/Auth/Login'
+import { hasLogout } from '../../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
+import { setRegister } from '../../../Redux/Actions/Auth/Register'
+
 import auth from '@react-native-firebase/auth'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { utils } from '@react-native-firebase/app'
@@ -12,11 +14,12 @@ import storage from '@react-native-firebase/storage'
 import database from '@react-native-firebase/database'
 
 const mapStateToProps = (state) => ({
-  login: state.isLogin
+  login: state.isLogin,
+  register: state.Register
 })
 
 const mapDispatchToProps = {
-  setLogin
+  hasLogout, setRegister
 }
 
 
@@ -25,11 +28,13 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
   constructor(props) {
     super(props)
     this.state = {
-      image: '',
+      image: auth().currentUser.photoURL || 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9',
       modalVisible1: false,
       modalVisible2: false,
-      name: 'Anonymous',
-      status: 'Available'
+      name: auth().currentUser.displayName || 'Anonymous',
+      status: 'Available',
+      phone: auth().currentUser.phoneNumber,
+     
     }
   }
 
@@ -54,15 +59,28 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
     await auth().currentUser.updateProfile(data)
   }
 
-  logout = () => {
-    auth().signOut().then(()=> Alert.alert('thanks'))
+  setUser = () => {
+    const data = {
+      name: this.state.name,
+      phone: this.state.phone,
+      uid: auth().currentUser.uid,
+    }
+    const updated = this.props.setRegister(data, data.phone)
+    if (updated) {
+      Alert.alert('Data has been updated')
+      this.props.navigation.navigate('Home')
+    }
   }
 
-  uploadFile = () => {
+  logout = () => {
+    this.props.hasLogout()
+  }
+
+  uploadFile = async () => {
     const reference = storage().ref(this.state.image)
   }
   render() {
-    console.log(this.props)
+    console.log(this.state.name)
     return (
       <>
         <ScrollView
@@ -75,7 +93,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             alignItems: "center",
             marginTop :20
           }}>
-            <Image source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9' }} style= {{
+            <Image source={{ uri: this.state.image }} style= {{
               width:150, height: 150 , borderRadius: 90
             }} />
             <View
@@ -163,7 +181,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
               <View style={styles.chat}>
                 <View style={{ marginLeft: 20 }}>
                   <Text style={{ fontSize: 12 }}> Phone </Text>
-                  <Text style={{ marginTop: 6, fontSize: 16 }}> Audy </Text>
+                  <Text style={{ marginTop: 6, fontSize: 16 }}> {this.state.phone} </Text>
                 </View>
                 <TouchableOpacity
                   onPress={this.logout}
@@ -179,7 +197,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             </View>
           </View>
           <ButtonSignout
-            onPress={()=> this.activeUser()}
+            onPress={this.setUser}
             title='Update'
             containerStyle={{
               justifyContent: 'center',
