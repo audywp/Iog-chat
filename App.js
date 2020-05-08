@@ -4,6 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import LoadingScreen from "./src/Components/LoadingScreen";
 import Stacks from './src/Screens/Main/StackNav'
 
+import SplashScreen from 'react-native-splash-screen'
+import { Platform } from 'react-native'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from './src/Redux/Store'
@@ -17,31 +19,25 @@ class App extends Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.setSplashTime();
-    }, 2000);
+    SplashScreen.hide()
   }
 
-  setSplashTime() {
-    this.setState({
-      splashTime: true
-    });
-  }
+  
 
   render() {
-    if (!this.state.splashTime) {
-      return <LoadingScreen />;
-    } else {
       return (
-        <Provider store={store}>
-          <PersistGate persistor={persistor}>
-            <NavigationContainer>
-              <Stacks />
-            </NavigationContainer>
-          </PersistGate>
-      </Provider>
+        <> 
+          {Platform.OS === 'ios' && <StatusBar barStyle="light-content" />}
+          <Provider store={store}>
+            <PersistGate persistor={persistor}>
+              <NavigationContainer>
+                <Stacks />
+              </NavigationContainer>
+            </PersistGate>
+        </Provider>
+      </>
       );
-    }
+    
   }
 }
 

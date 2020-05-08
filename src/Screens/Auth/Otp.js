@@ -12,6 +12,7 @@ function OneTimePassword(props) {
   console.log(code)
   async function onConfirm (verificationCode) {
     const { data, phone } = props.route.params
+    console.log(data)
     if (data) {
      props.setLogin(verificationCode,data)
     } else {

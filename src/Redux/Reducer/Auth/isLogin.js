@@ -1,10 +1,11 @@
 const initalState = {
-  data: {},
+  data: [],
+  hasLogin : [],
   isLogged: false,
   isLoading: false
 }
 
-export default function isLogin (state= initalState, action) {
+export default function isLogin (state = initalState, action) {
   switch (action.type) {
     case 'IS_LOGIN':
       return {
@@ -13,12 +14,20 @@ export default function isLogin (state= initalState, action) {
         isLoading: true,
         data: action.payload
       }
+    case 'HAS_LOGIN':
+      return {
+        ...state,
+        isLogged: true,
+        isLoading: true,
+        hasLogin: action.payload
+      }
     case 'LOGOUT':
       return {
         ...state,
         isLogged: false,
         isLoading: true,
-        data: {}
+        data: {},
+        hasLogin: {}
       }
     default:
       return{

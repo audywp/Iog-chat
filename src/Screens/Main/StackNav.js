@@ -10,6 +10,7 @@ import Contact from "../Main/Home/Contact"
 import OneTimePassword from '../Auth/Otp'
 import Profile from '../Main/Home/Profile'
 import HeaderNav from '../../Components/HeaderNav'
+import Maps from './Maps'
 
 import {setLogin} from '../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
@@ -47,6 +48,13 @@ const BottomStack = props => {
             <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
           )
         }} />
+        {/* <BottomTabs.Screen name="Maps" component={Maps} options={{
+          tabBarVisible: false,
+          tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
+          tabBarIcon: ({color, size}) => (
+            <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
+          )
+        }} /> */}
       </BottomTabs.Navigator>
     </>
   )
