@@ -9,6 +9,10 @@ import { connect } from 'react-redux'
 import { setRegister } from '../../../Redux/Actions/Auth/Register'
 import { CreateProfile, getDataProfile, UpdateUser, UploadPhoto } from '../../../Redux/Actions/User/Profile'
 
+import Geolocation from '@react-native-community/geolocation';
+Geolocation.setRNConfiguration({skipPermissionRequests: true});
+
+
 import  ImagePicker from 'react-native-image-picker'
 import auth from '@react-native-firebase/auth'
 import AntDesign from 'react-native-vector-icons/AntDesign'
@@ -43,7 +47,9 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
       placeholder: false,
       path: '',
       pictureName: null,
-      respone: false
+      respone: false,
+      longitude: '',
+      latitude: ''
     }
   }
 
@@ -74,7 +80,9 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
         name: this.state.name,
         status: this.state.status,
         phone: auth().currentUser.phoneNumber,
-        picture : urlPhoto
+        picture : urlPhoto,
+        longitude : this.state.longitude,
+        latitude :this.state.latitude
       }
       this.setState({
         loading: false
@@ -141,6 +149,12 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
   }
 
   async componentDidMount() {
+    Geolocation.getCurrentPosition(info => {
+      this.setState({
+        longitude : info.coords.longitude,
+        latitude :info.coords.latitude
+      })
+    })
     const reference = storage().ref('users.jpg');
     console.log('photo', reference)
     try {

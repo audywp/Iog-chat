@@ -4,14 +4,11 @@ import { Alert } from 'react-native'
 export const Chat = (phone,phoneFriend, massageFriend, myMessage) => async dispatch => {
   try {
     await database().
-    ref(`/messages/${phone}/`)
-    .child(`${phoneFriend}`)
-    .set(massageFriend)
-
-    await database().
-    ref(`/messages/${phoneFriend}/`)
+    ref(`messages`)
     .child(`${phone}`)
-    .set(myMessage)
+    .child(`${phoneFriend}`)
+    .on(massageFriend)
+
   } catch (error) {
     console.log(error)
   }

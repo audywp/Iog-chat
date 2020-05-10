@@ -10,7 +10,7 @@ import {
   Body,
   Button,
 } from 'native-base';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { connect } from 'react-redux'
 
 const mapStateToProps = state => {
@@ -43,7 +43,7 @@ class Header extends Component {
             onPress={this.props.onpress}
             transparent
           >
-            <MaterialCommunityIcons color={'white'} size={20} name="dots-vertical" />
+            <FontAwesome5 color={'white'} size={20} name="user-edit" />
           </TouchableOpacity>
         </Right>
       </Endas>

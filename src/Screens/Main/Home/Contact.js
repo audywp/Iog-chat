@@ -5,10 +5,12 @@ import { Thumbnail } from 'native-base'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { connect } from 'react-redux'
 import { setRegister } from '../../../Redux/Actions/Auth/Register'
+import { getDataProfile } from '../../../Redux/Actions/User/Profile'
 import { searchContacts, addContact, getContact } from '../../../Redux/Actions/Auth/addContact'
 import LoadingScreen from '../../../Components/LoadingScreen'
-
-
+import Geolocation from '@react-native-community/geolocation';
+Geolocation.setRNConfiguration({skipPermissionRequests: true});
+import MapView from 'react-native-maps'; 
 import auth from '@react-native-firebase/auth'
 import database from '@react-native-firebase/database'
 
@@ -18,7 +20,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-  setRegister, searchContacts, addContact, getContact
+  setRegister, searchContacts, addContact, getContact, getDataProfile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (class Contact extends Component {
@@ -30,7 +32,13 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
       modalVisible: false,
       phoneNumb: '',
       notFound: 'none',
-      loading: true
+      loading: true,
+      modalProfile: false,
+      imageUser: '',
+      nameUser: '',
+      phoneUser: '',
+      longitude: '',
+      latitude: ''
     }
   
 
@@ -79,6 +87,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
 
   componentDidMount = async () => {
     try {
+      await this.props.getDataProfile(auth().currentUser.phoneNumber)
       await this.props.getContact(auth().currentUser.phoneNumber)
       if (!this.props.friend.isLoading) {
         this.setState({
@@ -93,12 +102,15 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
     } catch (error) {
       console.log(error)
     }
+    Geolocation.requestAuthorization
+    Geolocation.watchPosition((info) => console.log(info));
   }
 
   render() {
     const { contact } = this.props.friend
-    const contacts = Object.values(contact)
-    const { users, phoneNumb, notFound } = this.state
+    const contacts = !contact ? null : Object.values(contact)
+    const { users, phoneNumb, notFound, longitude, latitude } = this.state
+    console.log(longitude, latitude, contacts)
     return (
       <View style={{ flex: 1 }}>
         <TouchableOpacity onPress={()=> this.setState({modalVisible: !this.state.modalVisible})} style={styles.addContact}>
@@ -109,12 +121,22 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
           { contacts && contacts.map((contact, i) => {
             return (
               <View key={ i }>
-                <TouchableOpacity style={styles.chatContainer}
-                  onPress={()=> this.props.navigation.navigate('Chat', { data: contact })}
+                <View style={styles.chatContainer}
+                  
                 >
-                  <View style={{ justifyContent: 'center' }}>
+                  <TouchableOpacity onPress={() => this.setState({
+                    modalProfile: !this.state.modalProfile,
+                    imageUser: contact.picture,
+                    nameUser: contact.name,
+                    phoneUser: contact.phone,
+                    longitude: contact.longitude,
+                    latitude: contact.latitude
+                  })}  style={{ justifyContent: 'center' }}>
                       <Thumbnail medium source={{uri: contact.picture}} />
-                  </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{
+                    flex: 1,
+                  }} onPress={()=> this.props.navigation.navigate('Chat', { data: contact })}>
                   <View style={styles.chat}>
                     <View style={{ justifyContent: 'space-evenly', marginLeft: 20 }}>
                       <Text style={{ color: '#189A8A' }}> {contact.name} </Text>
@@ -124,7 +146,8 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
                       <AntDesign name='message1' size={25} color='#189A8A' />
                     </View>
                   </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </View>
               </View>
             )
           })
@@ -206,6 +229,71 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Contact exten
               </View>
             </View>
           </Modal>
+          
+          <Modal
+              style={ styles.centeredView }
+              animationType='fade'
+              visible={this.state.modalProfile }
+              transparent={true}
+            >
+
+            <View style={{
+              justifyContent:'flex-end',
+              flex: 1,
+              alignItems: 'center',
+              backgroundColor: 'rgba(0,0,0,0.6)'
+            }}>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'white',
+                width: '90%',
+                borderRadius: 20,
+                marginBottom: 60
+              }}>
+              
+                <View style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  padding: 15
+                }}>
+                  <View style={{ justifyContent: 'center' }}>
+                      <Thumbnail medium source={{uri: this.state.imageUser}} />
+                  </View>
+                  <TouchableOpacity onPress={()=> this.setState({
+                      modalProfile: false
+                    })} style={styles.chat}>
+                    <View style={{ justifyContent: 'space-evenly', marginLeft: 20 }}>
+                      <Text style={{ color: '#189A8A' }}> {this.state.nameUser} </Text>
+                      <Text style={{ color: '#777' }}> {this.state.phoneUser} </Text>
+                    </View>
+                    <View style={{ justifyContent: 'center' }}>
+                      <AntDesign name='closecircleo' size={25} color='#189A8A' />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{
+               ...StyleSheet.absoluteFillObject,
+               height: 460,
+            }}>
+            <MapView
+              style={styles.map}
+              showsUserLocation
+              zoomControlEnabled
+              minZoomLevel={0}
+              initialRegion={{
+                latitude: this.state.latitude,
+                longitude: this.state.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}>
+              {/* {marker} */}
+            </MapView>
+          </View>
+            </View>
+            
+        </Modal>
       </View>
     )
   }
@@ -313,5 +401,15 @@ const styles = StyleSheet.create({
   conditionText: {
     fontSize: 18,
     marginLeft: 10,
-  }
+  },
+  // containerMap: {
+  //   ...StyleSheet.absoluteFillObject,
+  //   height: '100%',
+  //   width: '100%',
+  //   justifyContent: 'flex-end',
+  //   alignItems: 'center',
+  // },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
 })

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, HeaderBackground } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from 'react-native'
 import Greetings from "../Main/Greetings";
@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 const BottomTabs = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -40,19 +40,19 @@ const BottomStack = props => {
             <AntDesign name='contacts' size={25} color='#189A8A' />
             )
           }} />
-        <BottomTabs.Screen name="Chat" component={ChatScreen} options={{
-          tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
-          tabBarIcon: ({color, size}) => (
-            <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
-          )
-        }} />
-        {/* <BottomTabs.Screen name="Maps" component={Maps} options={{
-          tabBarVisible: false,
+        {/* <BottomTabs.Screen tabBarVisible = {false}  name="Chat" component={ChatScreen} options={{
           tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
           tabBarIcon: ({color, size}) => (
             <MaterialIcons name='chat-bubble-outline' size={25} color='#189A8A' />
           )
         }} /> */}
+        <BottomTabs.Screen name="Maps" component={Maps} options={{
+          tabBarVisible: false,
+          tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
+          tabBarIcon: ({color, size}) => (
+            <MaterialCommunityIcons name='google-maps' size={25} color='#189A8A' />
+          )
+        }} />
       </BottomTabs.Navigator>
     </>
   )
@@ -79,11 +79,17 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
               headerShown: false
             }}
           />
-            <Stack.Screen
-              name="Profile"
-              component={Profile}
-            />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
+            headerBackground= '#189A8A'
+          />
           </Stack.Navigator>
+          
         )
     } else {
       return (

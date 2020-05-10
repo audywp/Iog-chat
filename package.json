@@ -50,6 +50,7 @@
     "redux-promise-middleware": "^6.1.2",
     "redux-thunk": "^2.3.0",
     "rn-fetch-blob": "^0.12.0",
+    "sort-objects-array": "^1.7.1",
     "uuid": "^7.0.3",
     "yarn": "^1.22.4"
   },
