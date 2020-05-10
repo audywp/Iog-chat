@@ -1,26 +1,31 @@
 import React, { Component } from 'react'
 import { Text, View, ScrollView, TextInput, StyleSheet, Image, TouchableOpacity, Alert, Modal, ImageEditor } from 'react-native'
-import imagePicker from 'react-native-image-picker'
+
 import ButtonSignout from '../../../Components/Button'
 
+// redux
 import { hasLogout } from '../../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
 import { setRegister } from '../../../Redux/Actions/Auth/Register'
+import { CreateProfile, getDataProfile, UpdateUser, UploadPhoto } from '../../../Redux/Actions/User/Profile'
 
+import  ImagePicker from 'react-native-image-picker'
 import auth from '@react-native-firebase/auth'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { utils } from '@react-native-firebase/app'
 import storage from '@react-native-firebase/storage'
-import database from '@react-native-firebase/database'
+import LoadingScreen from '../../../Components/LoadingScreen'
 
 const mapStateToProps = (state) => ({
   login: state.isLogin,
-  register: state.Register
+  register: state.Register,
+  profile: state.Profile
 })
 
 const mapDispatchToProps = {
-  hasLogout, setRegister
+  hasLogout, setRegister, CreateProfile, getDataProfile, UpdateUser, UploadPhoto
 }
+
+// config image
 
 
 export default connect(mapStateToProps, mapDispatchToProps) (class Profile extends Component {
@@ -28,13 +33,17 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
   constructor(props) {
     super(props)
     this.state = {
-      image: auth().currentUser.photoURL || 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9',
+      image: {uri: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9'},
       modalVisible1: false,
       modalVisible2: false,
-      name: auth().currentUser.displayName || 'Anonymous',
-      status: 'Available',
+      name:'',
+      status:'',
       phone: auth().currentUser.phoneNumber,
-     
+      loading: false,
+      placeholder: false,
+      path: '',
+      pictureName: null,
+      respone: false
     }
   }
 
@@ -51,38 +60,171 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
     })
   }
 
-  activeUser = async () => {
-    const data = {
-      displayName: this.state.name,
-      photoURL: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/person1.jpg?alt=media&token=80db70a6-77a6-451a-a0d1-6b9a4f092398'
+  setUser = async () => {
+    if (this.state.path !== '') {
+      await this.props.UploadPhoto(this.state.path)
+      this.setState({
+        loading: false
+      })
+      const upload = storage().ref(`${this.state.pictureName}`)
+      await upload.putFile(this.state.path)
+      const urlPhoto = await storage().ref(`${this.state.pictureName}`).getDownloadURL()
+      const data = {
+        uid: auth().currentUser.uid,
+        name: this.state.name,
+        status: this.state.status,
+        phone: auth().currentUser.phoneNumber,
+        picture : urlPhoto
+      }
+      this.setState({
+        loading: false
+      })
+      try {
+        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+          if (!callback) {
+            this.props.CreateProfile( auth().currentUser.phoneNumber, data) 
+            Alert.alert('Create Account success')
+            this.props.getDataProfile(auth().currentUser.phoneNumber)
+          } else {
+            this.props.UpdateUser(auth().currentUser.phoneNumber, data)
+            Alert.alert('Updata success')
+            this.props.getDataProfile(auth().currentUser.phoneNumber)
+          }
+        })
+        await this.props.getDataProfile(auth().currentUser.phoneNumber)
+        this.setState({
+          loading: true,
+          image: {uri : this.props.profile.user.data.picture},
+          pictureName : null
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    } else {
+      this.setState({
+        loading: false
+      })
+      const data = {
+        uid: auth().currentUser.uid,
+        name: this.state.name,
+        status: this.state.status,
+        phone: auth().currentUser.phoneNumber,
+        picture: this.props.profile.user.data.picture || this.state.image.uri
+      }
+      this.setState({
+        loading: false
+      })
+      try {
+        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+          if (!callback) {
+            this.props.UpdateUser( auth().currentUser.phoneNumber, data) 
+            Alert.alert('Create Account success')
+          } else {
+            this.props.UpdateUser(auth().currentUser.phoneNumber, data)
+            Alert.alert('Updata success')
+          }
+        })
+        await this.props.getDataProfile(auth().currentUser.phoneNumber)
+        this.setState({
+          loading: true,
+          pictureName : null
+        })
+      } catch (error) {
+        console.log(error)
+      }
     }
-    await auth().currentUser.updateProfile(data)
-  }
-
-  setUser = () => {
-    const data = {
-      name: this.state.name,
-      phone: this.state.phone,
-      uid: auth().currentUser.uid,
-    }
-    const updated = this.props.setRegister(data, data.phone)
-    if (updated) {
-      Alert.alert('Data has been updated')
-      this.props.navigation.navigate('Home')
-    }
+    
   }
 
   logout = () => {
     this.props.hasLogout()
   }
 
-  uploadFile = async () => {
-    const reference = storage().ref(this.state.image)
+  async componentDidMount() {
+    const reference = storage().ref('users.jpg');
+    console.log('photo', reference)
+    try {
+      await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+        if (callback) {
+          this.setState({
+            image: {uri : this.props.profile.user.data.picture},
+            name: this.props.profile.user && this.props.profile.user.data.name,
+            status: this.props.profile.user && this.props.profile.user.data.status
+          })
+        } else {
+          this.setState({
+            name: 'Anonymous',
+            status: 'Available'
+          })
+        }
+        if (!this.props.isLoading) {
+          this.setState({
+            loading: true,
+            placeholder: true
+          })
+        }
+      })
+      if (this.props.isLoading) {
+        this.setState({
+          loading: false
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
+
+  imagePicker = async () => {
+    const options = {
+      title: 'Select Image',
+      // customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+      allowsEditing: true
+    };
+    if (!this.state.respone) {
+      this.setState({
+        loading: false
+      })
+    }
+    ImagePicker.launchImageLibrary(options, async respone => {
+      this.setState({
+        respone: true
+      })
+      if (respone.fileSize < 4194304) {
+        const cancel = respone.didCancel
+        const source = {uri: cancel && this.props.profile.user.data ? this.props.profile.user.data.picture : respone.uri }
+        const path = respone.path
+        console.log(path)
+        this.setState({
+          respone: false,
+          loading: true,
+          image: source,
+          path: path,
+          pictureName: respone.fileName
+        })
+      } else if (respone.didCancel) {
+        this.setState({
+          respone: false,
+          loading: true,
+        })
+      } else {
+        Alert.alert('Files size to large')
+        this.setState({
+          respone: false,
+          loading: true,
+        })
+      }
+      
+    })
+  }
+
   render() {
-    console.log(this.state.name)
     return (
       <>
+        {this.state.loading ? <></> : <LoadingScreen />}
         <ScrollView
           style={{
             paddingHorizontal: 20
@@ -93,9 +235,11 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             alignItems: "center",
             marginTop :20
           }}>
-            <Image source={{ uri: this.state.image }} style= {{
-              width:150, height: 150 , borderRadius: 90
-            }} />
+            
+              <Image  source={ this.state.image } style= {{
+                width:150, height: 150 , borderRadius: 90
+              }} />
+            
             <View
               style={{
                 backgroundColor: '#189A8A',
@@ -110,7 +254,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
               }}
             >
               <TouchableOpacity
-                onPress={this.choosePicture}
+                onPress={this.imagePicker}
               >
                 <Image source={require('../../../Assets/Images/photograph.png')}
                   style={{
@@ -214,8 +358,9 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
           />
         </ScrollView>
           <Modal
+            
             style={ styles.centeredView }
-            animationType='slide'
+            animationType='fade'
             visible={this.state.modalVisible1 }
             transparent={true}
           >
@@ -299,7 +444,6 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             </View>
 
           </Modal>
-          
       </>
     )
   }

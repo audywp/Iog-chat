@@ -22,26 +22,6 @@ export default class ChatScreen extends Component {
 
 
   async componentDidMount  ()  {
-    console.log(this.props)
-   await database()
-    .ref(`/users/${this.props.route.params.data.phone}/messages/${this.props.route.params.data.uid}/text/0/text`)
-    .on('value', value => {
-      this.setState(previousState => ({
-        messagesCurrentUser: GiftedChat.append(previousState.messages),
-        messages: [
-          {
-            _id: 1,
-            text: value.val(),
-            createdAt: new Date(),
-            user: {
-              _id: this.props.route.params.data.uid,
-              name: this.props.route.params.data.name,
-              avatar: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9',
-            },
-          },
-        ],
-      }))
-    })
     
   }
   async onSend(messages = []) {
@@ -62,10 +42,8 @@ export default class ChatScreen extends Component {
   }
 
   render() {
-    console.log(this.props)
-    console.log(this.state.phone)
     return (
-     
+      <>
         <GiftedChat
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
@@ -73,7 +51,7 @@ export default class ChatScreen extends Component {
             _id: auth().currentUser.uid,
           }}
         />
-      
+      </>
     )
   }
 }

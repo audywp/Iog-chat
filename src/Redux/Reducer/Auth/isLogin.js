@@ -1,5 +1,6 @@
 const initalState = {
   data: [],
+  otp: [],
   hasLogin : [],
   isLogged: false,
   isLoading: false
@@ -7,6 +8,13 @@ const initalState = {
 
 export default function isLogin (state = initalState, action) {
   switch (action.type) {
+    
+    case 'LOGIN':
+      return{
+        ...state,
+        isLoading: true,
+        otp: action.payload
+      }
     case 'IS_LOGIN':
       return {
         ...state,
@@ -25,13 +33,21 @@ export default function isLogin (state = initalState, action) {
       return {
         ...state,
         isLogged: false,
-        isLoading: true,
+        isLoading: false,
         data: {},
         hasLogin: {}
       }
-    default:
-      return{
-        ...state
+    case 'LOGIN_LOADING':
+      return {
+        ...state,
+        isLoading: false
       }
+    case 'FAILED_LOADING':
+      return {
+        ...state,
+        isLoading: true
+      }
+    default:
+      return state
   }
 }

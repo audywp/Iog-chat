@@ -4,7 +4,8 @@ import Button from '../../Components/Button'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import auth from '@react-native-firebase/auth'
 import { connect } from 'react-redux'
-import { hasLogin } from '../../Redux/Actions/Auth/Login'
+import { onLogin } from '../../Redux/Actions/Auth/Login'
+import { Spinner } from 'native-base'
 
 class Login extends Component {
   constructor (props) {
@@ -15,7 +16,7 @@ class Login extends Component {
       phoneNumb: '',
       confirm: null,
       code: '',
-      content: 'Continue'
+      loading: false
     }
   }
 
@@ -33,7 +34,6 @@ class Login extends Component {
           phoneNumb: '',
           confirm: null,
           code: '',
-          content: 'Continue'
         })
       }
     })
@@ -43,33 +43,34 @@ class Login extends Component {
     if (this.unsubscribe) {
       this.unsubscribe()
     }
+    this.setState({
+      loading: false
+    })
   }
 
   onLogin = async () => {
+    if (!this.props.login.isLoading) {
+      this.setState({
+        loading: true
+      })
+    }
     const { phoneNumb, confirm } = this.state
 
     this.setState({
       message: 'sending code ...'
     })
-
-    const res = await auth().signInWithPhoneNumber(phoneNumb)
     try {
-      if (res) {
-        this.setState({
-          confirm: res,
-          message: 'code has been send !',
-        })
-        this.props.navigation.navigate('OTP', { data: res, phone: phoneNumb })
-        console.log(res)
-      } else {
-        Alert.alert('your phone number is not valid')
-      }
+      await this.props.onLogin(phoneNumb).then(() => {
+        this.props.navigation.navigate('OTP')
+      }) 
     } catch (error) {
       console.log(error)
     }
+    
   }
 
   render () {
+    console.log(this.props.login.isLoading)
     return (
       <ScrollView style={{ backgroundColor: 'white', flex: 1 }}>
         <View style={{ alignItems: 'center' }}>
@@ -110,22 +111,24 @@ class Login extends Component {
               }}
             />
           </View>
-          <Button
-            onPress={() => this.onLogin(this.state.phoneNumb)}
-            title={this.state.content}
-            containerStyle={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 20
-            }}
-            style={{
-              width: 250,
-              backgroundColor: '#189A8A',
-              borderRadius: 20
-            }}
-            textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
-          />
-          
+          <View>
+            <Button
+              onPress={() => this.onLogin(this.state.phoneNumb)}
+              title='Continue'
+              loading={this.state.loading}
+              containerStyle={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 20
+              }}
+              style={{
+                width: 250,
+                backgroundColor: '#189A8A',
+                borderRadius: 20
+              }}
+              textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
+            />
+          </View>
           <Text style= {{ marginTop: 10, marginBottom: 5 }}>
             Didn't have account ?
           </Text>
@@ -142,13 +145,11 @@ class Login extends Component {
 }
 
 const mapStateToProps = (state) => ({
-  
     login: state.isLogin
-  
 })
 
 const mapDispatchToProps = {
-  hasLogin
+  onLogin
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (Login)

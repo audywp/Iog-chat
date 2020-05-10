@@ -1,20 +1,31 @@
 const initalState = {
-  data: [],
+  friend: [],
+  contact: [],
   isLoading: false,
 }
 
-export default function Register (state= initalState, action) {
+export default function addContact (state= initalState, action) {
   switch (action.type) {
     case 'ADD_CONTACT':
       return {
         ...state,
         isLoading: true,
-        data: action.payload
+        friend: action.payload
       }
-  
+    case 'CONTACT_LOADING' : 
+      return {
+        ...state,
+        isLoading: false,
+      }
+    case 'LIST_CONTACT':
+      return {
+        ...state,
+        isLoading: true,
+        contact: action.payload
+      }
     default:
-      return{
-        ...state
-      }
+       return {
+         ...state
+        }
   }
 }

@@ -31,8 +31,6 @@ const BottomStack = props => {
   return (
     <>
       <HeaderNav
-        source={require('../../Assets/Images/person1.jpg')}
-        title='IOG'
         onpress={Profile}
       />
       <BottomTabs.Navigator>
@@ -63,7 +61,8 @@ const BottomStack = props => {
 const mapStateToProps = state => {
   return {
     login: state.isLogin,
-    register: state.Register
+    register: state.Register,
+    profile: state.Profile
   }
 }
 export default connect(mapStateToProps, { setLogin })(class StackNav extends Component {

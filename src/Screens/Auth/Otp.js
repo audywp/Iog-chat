@@ -4,21 +4,36 @@ import ButtonSend from '../../Components/Button';
 import OtpInputs from 'react-native-otp-inputs';
 import { setLogin } from '../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
+import { getContact } from '../../Redux/Actions/Auth/addContact'
+import { getDataProfile } from '../../Redux/Actions/User/Profile'
 import auth from '@react-native-firebase/auth'
 import { Spinner } from 'native-base';
 
 function OneTimePassword(props) {
   const [code, setCode] = useState([]);
-  console.log(code)
+  const [loading, setLoading] = useState(false)
   async function onConfirm (verificationCode) {
-    const { data, phone } = props.route.params
-    console.log(data)
-    if (data) {
-     props.setLogin(verificationCode,data)
-    } else {
-      console.log('failed')
+    try {
+      if (!props.login.isLoading) {
+        setLoading(true)
+      }
+      const { otp } = props.login
+      if (otp) {
+       await props.setLogin(verificationCode,otp, (status) => {
+         console.log(status)
+         if (!status) {
+           props.navigation.navigate('Profile')
+         } else {
+           console.log('check')
+         }
+       })
+       await props.getDataProfile(auth().currentUser.phoneNumber)
+      } else {
+        console.log('failed')
+      }
+    } catch (error) {
+      console.log(error)
     }
-    console.log(code)
   }
 
   // async function onReset () {
@@ -125,6 +140,7 @@ function OneTimePassword(props) {
           <ButtonSend
             onPress={() => onConfirm(code)}
             title="Send"
+            loading={loading}
             containerStyle={{
               justifyContent: 'center',
               alignItems: 'center',
@@ -163,4 +179,4 @@ const mapStateToProps = state => {
     login: state.isLogin
   }
 }
-export default connect(mapStateToProps, { setLogin })(OneTimePassword)
+export default connect(mapStateToProps, { setLogin, getContact, getDataProfile })(OneTimePassword)

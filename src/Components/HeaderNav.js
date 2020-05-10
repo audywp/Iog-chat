@@ -11,7 +11,13 @@ import {
   Button,
 } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { connect } from 'react-redux'
 
+const mapStateToProps = state => {
+  return {
+    profile: state.Profile
+  }
+}
 class Header extends Component {
   constructor(props) {
     super(props);
@@ -27,10 +33,10 @@ class Header extends Component {
         }}
       >
         <Left>
-          <Thumbnail small source={this.props.source} />
+          <Thumbnail small source={{uri: this.props.profile.user.data && this.props.profile.user.data.picture}} />
         </Left>
         <Body>
-          <Title>{this.props.title}</Title>
+          <Title>{this.props.profile.user.data && this.props.profile.user.data.name}</Title>
         </Body>
         <Right>
           <TouchableOpacity
@@ -45,4 +51,4 @@ class Header extends Component {
   }
 }
 
-export default Header;
+export default connect(mapStateToProps) (Header);

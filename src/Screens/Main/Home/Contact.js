@@ -3,14 +3,25 @@ import { Text, View, StyleSheet, ScrollView, Modal, TextInput, TouchableOpacity 
 import HeaderProf from '../../../Components/HeaderNav'
 import { Thumbnail } from 'native-base'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-
+import { connect } from 'react-redux'
+import { setRegister } from '../../../Redux/Actions/Auth/Register'
+import { searchContacts, addContact, getContact } from '../../../Redux/Actions/Auth/addContact'
+import LoadingScreen from '../../../Components/LoadingScreen'
 
 
 import auth from '@react-native-firebase/auth'
 import database from '@react-native-firebase/database'
 
+const mapStateToProps = (state) => ({
+  friend: state.addContact,
+  login: state.isLogin
+})
 
-export default class Contact extends Component {
+const mapDispatchToProps = {
+  setRegister, searchContacts, addContact, getContact
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (class Contact extends Component {
 
     state = {
       search : '',
@@ -18,7 +29,8 @@ export default class Contact extends Component {
       contacts: [],
       modalVisible: false,
       phoneNumb: '',
-      notFound: 'none'
+      notFound: 'none',
+      loading: true
     }
   
 
@@ -27,77 +39,93 @@ export default class Contact extends Component {
   }
 
   async addContactByPhone(phone) {
-    await database()
-    .ref(`/users/${phone}`)
-    .once('value')
-    .then(snapshot=>{
-      const current_user = auth().currentUser.phoneNumber
-      const data = snapshot.val()
-      console.log(data)
-      if (data && this.state.phoneNumb.length > 1 && data.phone != current_user) {
-        this.setState({
-          users: data
-        })
-      } else {
-        this.setState({
-          notFound: 'User Not Found'
-        })
-      }
-    })
+    try {
+      await this.props.searchContacts(phone, status => {
+        console.log(this.props.friend.friend.data)
+        if (status) {
+          this.setState({
+            users : this.props.friend.friend.data && this.props.friend.friend.data
+          })
+        }
+        if (!status) {
+          this.setState({
+            notFound: 'User Not Found'
+          })
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
   async addContact(phone) {
+    const current_user = auth().currentUser.phoneNumber
+    try {
     await database()
-    .ref(`/users/${phone}`)
+    .ref(`/users/${auth().currentUser.phoneNumber}/data`)
     .once('value')
-    .then(snapshot=>{
-      const current_user = auth().currentUser.phoneNumber 
-      const data = snapshot.val()
-      database()
-      .ref(`/users/${current_user}/friend`)
-      .push(data)
-      this.state.contacts.push(data)
-      this.setState({
-        modalVisible: false
-      })
+    .then(snapshot =>{
+       this.props.addContact(current_user, phone, this.state.users, snapshot.val())
+       this.props.getContact(current_user)
     })
+    await this.props.getContact(current_user)
+    
+    this.setState({
+      modalVisible: false
+    })
+    } catch (error) {
+      console.log(error)
+    }
   }
-  // async contacts () {
-  //   const current_user = auth().currentUser.phoneNumber
-  //   await database().ref(`/users/${current_user}/friend`)
-  //   .once('value')
-  //   .then(async snapshot=>{
-  //     const user = await snapshot.val()
-        
-        
-  //   })
-  // }
+
+  componentDidMount = async () => {
+    try {
+      await this.props.getContact(auth().currentUser.phoneNumber)
+      if (!this.props.friend.isLoading) {
+        this.setState({
+          loading: true
+        })
+      }
+      if (!this.props.friend.isLoading) {
+        this.setState({
+          loading: false
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   render() {
-    const { users, phoneNumb, contacts, notFound } = this.state
-    console.log(contacts)
+    const { contact } = this.props.friend
+    const contacts = Object.values(contact)
+    const { users, phoneNumb, notFound } = this.state
     return (
       <View style={{ flex: 1 }}>
         <TouchableOpacity onPress={()=> this.setState({modalVisible: !this.state.modalVisible})} style={styles.addContact}>
           <AntDesign name='pluscircleo' size={35} color='#189A8A' />
         </TouchableOpacity>
+        {!this.state.loading ? <></> : <LoadingScreen />}
         <ScrollView style={styles.container}>
           { contacts && contacts.map((contact, i) => {
             return (
-              <TouchableOpacity key={ i } style={styles.chatContainer}
-                onPress={()=> this.props.navigation.navigate('Chat', { data: contact })}
-              >
-                <View style={{ justifyContent: 'center' }}>
-                    <Thumbnail medium source={require('../../../Assets/Images/person1.jpg')} />
-                </View>
-                <View style={styles.chat}>
-                  <View style={{ justifyContent: 'space-evenly', marginLeft: 20 }}>
-                    <Text style={{ color: '#189A8A' }}> {contact.name} </Text>
-                    <Text style={{ color: '#777' }}> {contact.phone} </Text>
-                  </View>
+              <View key={ i }>
+                <TouchableOpacity style={styles.chatContainer}
+                  onPress={()=> this.props.navigation.navigate('Chat', { data: contact })}
+                >
                   <View style={{ justifyContent: 'center' }}>
-                    <AntDesign name='message1' size={25} color='#189A8A' />
+                      <Thumbnail medium source={{uri: contact.picture}} />
                   </View>
-                </View>
-              </TouchableOpacity>
+                  <View style={styles.chat}>
+                    <View style={{ justifyContent: 'space-evenly', marginLeft: 20 }}>
+                      <Text style={{ color: '#189A8A' }}> {contact.name} </Text>
+                      <Text style={{ color: '#777' }}> {contact.phone} </Text>
+                    </View>
+                    <View style={{ justifyContent: 'center' }}>
+                      <AntDesign name='message1' size={25} color='#189A8A' />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
             )
           })
           }
@@ -161,7 +189,7 @@ export default class Contact extends Component {
                       onPress={() => this.addContact(phoneNumb)}
                     >
                       <View style={{ justifyContent: 'center' }}>
-                          <Thumbnail medium source={{ uri: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9' }} />
+                          <Thumbnail medium source={{ uri: users.picture }} />
                       </View>
                       <View style={styles.chat}>
                         <View style={{ justifyContent: 'space-evenly', marginLeft: 20 }}>
@@ -181,7 +209,7 @@ export default class Contact extends Component {
       </View>
     )
   }
-}
+})
 
 const styles = StyleSheet.create({
   container: {

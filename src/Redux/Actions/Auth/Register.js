@@ -1,13 +1,26 @@
 import database from '@react-native-firebase/database'
 import { Alert } from 'react-native'
 
-export const setRegister = (data, phone) => async dispatch => {
-  await database().ref(`/users/${phone}`).update(data)
+export const setRegister = (phone) => async dispatch => {
+  
   try {
-      dispatch({
-        type:'IS_REGISTER',
-      })
+    await database().ref(`/users/${phone}`).once('value').then(
+      snapshot => {
+        if (snapshot.val()) {
+          dispatch({
+            type:'IS_REGISTER',
+            payload: snapshot.val()
+          })
+        } else {
+          this.props.navigation.navigate('Profile')
+        }
+      }
+    )
   } catch (error) {
+    this.props.navigation.navigate('Profile')
+    dispatch({
+      type: 'NOT_REGISTER'
+    })
     console.log(error)
   }
 }
