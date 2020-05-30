@@ -11,8 +11,8 @@ import OneTimePassword from '../Auth/Otp'
 import Profile from '../Main/Home/Profile'
 import HeaderNav from '../../Components/HeaderNav'
 import Maps from './Maps'
-
-import {setLogin} from '../../Redux/Actions/Auth/Login'
+import { checkConnection, unsubscribe } from '../../Utils/config'
+import { setLogin } from '../../Redux/Actions/Auth/Login'
 import { connect } from 'react-redux'
 
 
@@ -36,10 +36,10 @@ const BottomStack = props => {
       <BottomTabs.Navigator>
         <BottomTabs.Screen name="Contact" component={Contact} options={{
           tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
-          tabBarIcon: ({color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <AntDesign name='contacts' size={25} color='#189A8A' />
-            )
-          }} />
+          )
+        }} />
         {/* <BottomTabs.Screen tabBarVisible = {false}  name="Chat" component={ChatScreen} options={{
           tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
           tabBarIcon: ({color, size}) => (
@@ -49,7 +49,7 @@ const BottomStack = props => {
         <BottomTabs.Screen name="Maps" component={Maps} options={{
           tabBarVisible: false,
           tabBarLabel: () => <Text style={{ display: 'none' }}></Text>,
-          tabBarIcon: ({color, size}) => (
+          tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name='google-maps' size={25} color='#189A8A' />
           )
         }} />
@@ -70,8 +70,8 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
   render() {
     const { login, register } = this.props
     if (login.isLogged) {
-        return (
-          <Stack.Navigator>
+      return (
+        <Stack.Navigator>
           <Stack.Screen
             name="Home"
             component={BottomStack}
@@ -86,11 +86,11 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
           <Stack.Screen
             name="Chat"
             component={ChatScreen}
-            headerBackground= '#189A8A'
+            headerBackground='#189A8A'
           />
-          </Stack.Navigator>
-          
-        )
+        </Stack.Navigator>
+
+      )
     } else {
       return (
         <Stack.Navigator>
@@ -115,7 +115,7 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
               headerShown: false
             }}
           />
-        
+
           <Stack.Screen
             name="OTP"
             component={OneTimePassword}
@@ -123,7 +123,7 @@ export default connect(mapStateToProps, { setLogin })(class StackNav extends Com
               headerShown: false
             }}
           />
-          
+
         </Stack.Navigator>
       )
     }

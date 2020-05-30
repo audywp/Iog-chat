@@ -2,11 +2,12 @@ const initialState = {
   user: [],
   message: [],
   path: [],
+  curentPos: [],
   isLoading: false,
   isRegistered: false
 }
 
-export default function Profile (state = initialState, action) {
+export default function Profile(state = initialState, action) {
   switch (action.type) {
     case 'CREATE':
       return {
@@ -25,6 +26,12 @@ export default function Profile (state = initialState, action) {
         ...state,
         path: action.payload
       }
+    case 'CURENT_POS':
+      return {
+        ...state,
+        isLoading: true,
+        curentPos: action.payload,
+      }
     case 'LOADING_PROFILE':
       return {
         ...state,
@@ -36,6 +43,6 @@ export default function Profile (state = initialState, action) {
         isLoading: true
       }
     default:
-      return {...state}
+      return { ...state }
   }
 }
