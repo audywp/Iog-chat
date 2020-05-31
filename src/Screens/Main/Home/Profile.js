@@ -10,10 +10,10 @@ import { setRegister } from '../../../Redux/Actions/Auth/Register'
 import { CreateProfile, getDataProfile, UpdateUser, UploadPhoto } from '../../../Redux/Actions/User/Profile'
 
 import Geolocation from '@react-native-community/geolocation';
-Geolocation.setRNConfiguration({skipPermissionRequests: true});
+Geolocation.setRNConfiguration({ skipPermissionRequests: true });
 
 
-import  ImagePicker from 'react-native-image-picker'
+import ImagePicker from 'react-native-image-picker'
 import auth from '@react-native-firebase/auth'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import storage from '@react-native-firebase/storage'
@@ -32,16 +32,16 @@ const mapDispatchToProps = {
 // config image
 
 
-export default connect(mapStateToProps, mapDispatchToProps) (class Profile extends Component {
+export default connect(mapStateToProps, mapDispatchToProps)(class Profile extends Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      image: {uri: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9'},
+      image: { uri: 'https://firebasestorage.googleapis.com/v0/b/iogchat.appspot.com/o/user.png?alt=media&token=3916d464-a072-43e3-a4af-9826f83af6e9' },
       modalVisible1: false,
       modalVisible2: false,
-      name:'',
-      status:'',
+      name: '',
+      status: '',
       phone: auth().currentUser.phoneNumber,
       loading: false,
       placeholder: false,
@@ -80,17 +80,17 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
         name: this.state.name,
         status: this.state.status,
         phone: auth().currentUser.phoneNumber,
-        picture : urlPhoto,
-        longitude : this.state.longitude,
-        latitude :this.state.latitude
+        picture: urlPhoto,
+        longitude: this.state.longitude,
+        latitude: this.state.latitude
       }
       this.setState({
         loading: false
       })
       try {
-        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback => {
           if (!callback) {
-            this.props.CreateProfile( auth().currentUser.phoneNumber, data) 
+            this.props.CreateProfile(auth().currentUser.phoneNumber, data)
             Alert.alert('Create Account success')
             this.props.getDataProfile(auth().currentUser.phoneNumber)
           } else {
@@ -102,8 +102,8 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
         await this.props.getDataProfile(auth().currentUser.phoneNumber)
         this.setState({
           loading: true,
-          image: {uri : this.props.profile.user.data.picture},
-          pictureName : null
+          image: { uri: this.props.profile.user.data.picture },
+          pictureName: null
         })
       } catch (error) {
         console.log(error)
@@ -123,9 +123,9 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
         loading: false
       })
       try {
-        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+        await this.props.getDataProfile(auth().currentUser.phoneNumber, callback => {
           if (!callback) {
-            this.props.UpdateUser( auth().currentUser.phoneNumber, data) 
+            this.props.UpdateUser(auth().currentUser.phoneNumber, data)
             Alert.alert('Create Account success')
           } else {
             this.props.UpdateUser(auth().currentUser.phoneNumber, data)
@@ -135,13 +135,13 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
         await this.props.getDataProfile(auth().currentUser.phoneNumber)
         this.setState({
           loading: true,
-          pictureName : null
+          pictureName: null
         })
       } catch (error) {
         console.log(error)
       }
     }
-    
+
   }
 
   logout = () => {
@@ -151,17 +151,17 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
   async componentDidMount() {
     Geolocation.getCurrentPosition(info => {
       this.setState({
-        longitude : info.coords.longitude,
-        latitude :info.coords.latitude
+        longitude: info.coords.longitude,
+        latitude: info.coords.latitude
       })
     })
     const reference = storage().ref('users.jpg');
     console.log('photo', reference)
     try {
-      await this.props.getDataProfile(auth().currentUser.phoneNumber, callback =>{
+      await this.props.getDataProfile(auth().currentUser.phoneNumber, callback => {
         if (callback) {
           this.setState({
-            image: {uri : this.props.profile.user.data.picture},
+            image: { uri: this.props.profile.user.data.picture },
             name: this.props.profile.user && this.props.profile.user.data.name,
             status: this.props.profile.user && this.props.profile.user.data.status
           })
@@ -209,7 +209,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
       })
       if (respone.fileSize < 4194304) {
         const cancel = respone.didCancel
-        const source = {uri: cancel && this.props.profile.user.data ? this.props.profile.user.data.picture : respone.uri }
+        const source = { uri: cancel && this.props.profile.user.data ? this.props.profile.user.data.picture : respone.uri }
         const path = respone.path
         console.log(path)
         this.setState({
@@ -231,7 +231,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
           loading: true,
         })
       }
-      
+
     })
   }
 
@@ -244,20 +244,20 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             paddingHorizontal: 20
           }}
         >
-          <View style= {{
+          <View style={{
             justifyContent: "center",
             alignItems: "center",
-            marginTop :20
+            marginTop: 20
           }}>
-            
-              <Image  source={ this.state.image } style= {{
-                width:150, height: 150 , borderRadius: 90
-              }} />
-            
+
+            <Image source={this.state.image} style={{
+              width: 150, height: 150, borderRadius: 90
+            }} />
+
             <View
               style={{
                 backgroundColor: '#189A8A',
-                width: 40, 
+                width: 40,
                 height: 40,
                 borderRadius: 30,
                 justifyContent: 'center',
@@ -286,21 +286,21 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
           >
             <View style={styles.chatContainer}>
               <View style={{ justifyContent: 'center' }}>
-                  <Image source={require('../../../Assets/Images/name.png')}
-                    style={{
-                      width: 35,
-                      height: 35
-                    }}
-                  />
+                <Image source={require('../../../Assets/Images/name.png')}
+                  style={{
+                    width: 35,
+                    height: 35
+                  }}
+                />
               </View>
               <View style={styles.chat}>
                 <View style={{ marginLeft: 20 }}>
                   <Text style={{ fontSize: 12 }}> Name </Text>
-                  <Text style={{ marginTop: 6, fontSize: 16 }}> { this.state.name } </Text>
+                  <Text style={{ marginTop: 6, fontSize: 16 }}> {this.state.name} </Text>
                 </View>
                 <TouchableOpacity
                   onPress={this.modalUsername}
-                  style={{ 
+                  style={{
                     justifyContent: 'center'
                   }}
                 >
@@ -319,7 +319,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
                 </View>
                 <TouchableOpacity
                   onPress={this.modalStatus}
-                  style={{ 
+                  style={{
                     justifyContent: 'center'
                   }}
                 >
@@ -329,12 +329,12 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             </View>
             <View style={styles.chatContainer}>
               <View style={{ justifyContent: 'center' }}>
-                  <Image source={require('../../../Assets/Images/phone.png')}
-                    style={{
-                      width: 35,
-                      height: 35
-                    }}
-                  />
+                <Image source={require('../../../Assets/Images/phone.png')}
+                  style={{
+                    width: 35,
+                    height: 35
+                  }}
+                />
               </View>
               <View style={styles.chat}>
                 <View style={{ marginLeft: 20 }}>
@@ -343,7 +343,7 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
                 </View>
                 <TouchableOpacity
                   onPress={this.logout}
-                  style={{ 
+                  style={{
                     justifyContent: 'center',
                     alignItems: 'flex-end'
                   }}
@@ -371,93 +371,93 @@ export default connect(mapStateToProps, mapDispatchToProps) (class Profile exten
             textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
           />
         </ScrollView>
-          <Modal
-            
-            style={ styles.centeredView }
-            animationType='fade'
-            visible={this.state.modalVisible1 }
-            transparent={true}
-          >
+        <Modal
 
-            <View style={ styles.centeredView }>
-              <View style={ styles.modalView }>
-                <Text> Enter your name </Text>
-                <View style={styles.inputField}>
-                  <Image source={require('../../../Assets/Images/name.png')}
-                    style={{
-                      width: 35,
-                      height: 35
-                    }}
-                  />
-                  <TextInput
-                    placeholder='Name'
-                    placeholderTextColor='#ddd'
-                    onChangeText={text => this.setState({ name: text })}
-                    value = { this.state.name }
-                    style={{
-                      paddingHorizontal: 50,
-                      marginTop: 10,
-                      borderBottomWidth: 2,
-                      borderColor: '#189A8A',
-                      width: 230,
-                      height: 40,
-                      marginLeft: 5,
-                    }}
-                  />
-                </View>
-                <View style={styles.condition}>
-                  <TouchableOpacity style={styles.conditionText}
-                    onPress={()=> this.setState({ modalVisible1: false })}
-                  >
-                    <Text style={{ color: '#189A8A' }}> Save </Text>
-                  </TouchableOpacity>
-                </View>
+          style={styles.centeredView}
+          animationType='fade'
+          visible={this.state.modalVisible1}
+          transparent={true}
+        >
+
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text> Enter your name </Text>
+              <View style={styles.inputField}>
+                <Image source={require('../../../Assets/Images/name.png')}
+                  style={{
+                    width: 35,
+                    height: 35
+                  }}
+                />
+                <TextInput
+                  placeholder='Name'
+                  placeholderTextColor='#ddd'
+                  onChangeText={text => this.setState({ name: text })}
+                  value={this.state.name}
+                  style={{
+                    paddingHorizontal: 50,
+                    marginTop: 10,
+                    borderBottomWidth: 2,
+                    borderColor: '#189A8A',
+                    width: 230,
+                    height: 40,
+                    marginLeft: 5,
+                  }}
+                />
+              </View>
+              <View style={styles.condition}>
+                <TouchableOpacity style={styles.conditionText}
+                  onPress={() => this.setState({ modalVisible1: false })}
+                >
+                  <Text style={{ color: '#189A8A' }}> Save </Text>
+                </TouchableOpacity>
               </View>
             </View>
+          </View>
 
-          </Modal>
-          
-        
-        
-          <Modal
-            style={ styles.centeredView }
-            animationType='slide'
-            visible={this.state.modalVisible2 }
-            transparent={true}
-          >
+        </Modal>
 
-            <View style={ styles.centeredView }>
-              <View style={ styles.modalView }>
-                <Text> Status </Text>
-                <View style={styles.inputField}>
-                  <AntDesign name='exclamationcircleo' size={35} color={'#189A8A'} />
-                  <TextInput
-                    placeholder='Name'
-                    placeholderTextColor='#ddd'
-                    onChangeText={text => this.setState({ status: text })}
-                    value = { this.state.status }
-                    style={{
-                      paddingHorizontal: 50,
-                      marginTop: 10,
-                      borderBottomWidth: 2,
-                      borderColor: '#189A8A',
-                      width: 230,
-                      height: 40,
-                      marginLeft: 5,
-                    }}
-                  />
-                </View>
-                <View style={styles.condition}>
-                  <TouchableOpacity style={styles.conditionText}
-                    onPress={()=> this.setState({ modalVisible2: false })}
-                  >
-                    <Text style={{ color: '#189A8A' }}> Save </Text>
-                  </TouchableOpacity>
-                </View>
+
+
+        <Modal
+          style={styles.centeredView}
+          animationType='slide'
+          visible={this.state.modalVisible2}
+          transparent={true}
+        >
+
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text> Status </Text>
+              <View style={styles.inputField}>
+                <AntDesign name='exclamationcircleo' size={35} color={'#189A8A'} />
+                <TextInput
+                  placeholder='Name'
+                  placeholderTextColor='#ddd'
+                  onChangeText={text => this.setState({ status: text })}
+                  value={this.state.status}
+                  style={{
+                    paddingHorizontal: 50,
+                    marginTop: 10,
+                    borderBottomWidth: 2,
+                    borderColor: '#189A8A',
+                    width: 230,
+                    height: 40,
+                    marginLeft: 5,
+                  }}
+                />
+              </View>
+              <View style={styles.condition}>
+                <TouchableOpacity style={styles.conditionText}
+                  onPress={() => this.setState({ modalVisible2: false })}
+                >
+                  <Text style={{ color: '#189A8A' }}> Save </Text>
+                </TouchableOpacity>
               </View>
             </View>
+          </View>
 
-          </Modal>
+        </Modal>
       </>
     )
   }
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   },
   chat: {
     flexDirection: 'row',
-    flex:1,
+    flex: 1,
     justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderColor: '#ddd'
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: "center"
   },
-  inputField:{
+  inputField: {
     flexDirection: 'row',
     alignItems: 'flex-end',
   },

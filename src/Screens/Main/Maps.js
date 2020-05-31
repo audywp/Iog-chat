@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
-import {StyleSheet, View, Text, Image} from 'react-native';
-import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
+import React, { Component } from 'react';
+import { StyleSheet, View, Text, Image } from 'react-native';
+import MapView, { AnimatedRegion, Marker } from 'react-native-maps';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Geolocation from '@react-native-community/geolocation';
-Geolocation.setRNConfiguration({skipPermissionRequests: true});
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,44 +19,43 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class maps extends Component {
+const mapStateToProps = (state) => ({
+  pos: state.Profile
+})
+
+const mapDispatchToProps = {
+
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(class maps extends Component {
   state = {
-    users: [],
+    loading: false
   };
 
-  componentDidMount() {
-    Geolocation.requestAuthorization
-    Geolocation.watchPosition((info) => console.log(info));
-    this.getDataUser();
+  async componentDidMount() {
+    try {
+      Geolocation.watchPosition((info) => console.log(info), err => console.log(err), { enableHighAccuracy: false });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  getDataUser() {
-    database()
-      .ref(`users/${auth().currentUser.phoneNumber}/friend`)
-      .on('value', (snapshot) => {
-        const current_user = auth().currentUser.uid;
-        console.log(snapshot.val())
-        console.log('hahaha', current_user);
-        const data = snapshot.val();
-        const user = Object.values(data);
-        this.setState({
-          users: user,
-        });
-      });
-  }
+
   render() {
-    const marker = this.state.users.map((item) => (
-      <MapView.Marker
+    console.log(this.props)
+    const marker = this.props.pos.curentPos && this.props.pos.curentPos.map((item, i) => (
+      <MapView.Marker key={i}
         coordinate={{
           latitude: item.latitude,
           longitude: item.longitude,
         }}
-        
+
         description="My Location">
         <Text style={{ color: '#189A8A' }}>{item.name}</Text>
         <Image
-          source={{uri: item.picture}}
-          style={{width: 30, height: 38, borderRadius: 40}}
+          source={{ uri: item.picture }}
+          style={{ width: 30, height: 38, borderRadius: 40 }}
         />
       </MapView.Marker>
     ));
@@ -68,8 +67,8 @@ export default class maps extends Component {
           zoomControlEnabled
           minZoomLevel={0}
           initialRegion={{
-            latitude: -6.6211252,
-            longitude: 106.818001,
+            latitude: this.props.pos.pos.latitude,
+            longitude: this.props.pos.pos.longitude,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}>
@@ -78,4 +77,4 @@ export default class maps extends Component {
       </View>
     );
   }
-}
+})

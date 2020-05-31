@@ -3,6 +3,7 @@ const initialState = {
   message: [],
   path: [],
   curentPos: [],
+  pos: [],
   isLoading: false,
   isRegistered: false
 }
@@ -31,6 +32,12 @@ export default function Profile(state = initialState, action) {
         ...state,
         isLoading: true,
         curentPos: action.payload,
+      }
+    case 'USER_POS':
+      return {
+        ...state,
+        isLoading: true,
+        pos: action.payload
       }
     case 'LOADING_PROFILE':
       return {

@@ -1,58 +1,22 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View } from "native-base";
 import {
   Text,
   Image,
   TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  StyleSheet,
-  Dimensions
+  View
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 Geolocation.setRNConfiguration({ skipPermissionRequests: true });
 import ButtonComp from "../../Components/Button";
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
-import { CurentPos } from '../../Redux/Actions/User/CurentPos';
 import { connect } from 'react-redux';
-import { checkConnection, unsubscribe } from '../../Utils/config';
 
-
-const wait = timeout => {
-  return new Promise(resolve => {
-    setTimeout(resolve, timeout);
-  });
-};
 const Greetings = props => {
-  const [refreshing, setRefreshing] = useState(false);
   const [Location, setLocation] = useState(false);
-  const [conn, setConn] = useState(false);
   useEffect(() => {
-    checkConnection(callback => {
-      if (callback) {
-        setConn(true);
-        RequestLocation();
-      } else {
-        setConn(false);
-      }
-    });
+    RequestLocation();
     console.log(Location);
-    unsubscribe();
   }, [RequestLocation, setCurrentPos, Location]);
-
-  const onRefresh = React.useCallback(() => {
-    checkConnection(callback => {
-      if (callback) {
-        setConn(true);
-        RequestLocation();
-      } else {
-        setConn(false);
-      }
-    });
-    setRefreshing(true);
-
-    wait(200).then(() => setRefreshing(false));
-  }, [refreshing]);
 
   const RequestLocation = useCallback(async () => {
     try {
@@ -83,7 +47,7 @@ const Greetings = props => {
   const setCurrentPos = useCallback(() => {
     if (Location) {
       Geolocation.getCurrentPosition(
-        Position => props.CurentPos(Position.coords),
+        Position => console.log(Position),
         err => console.log(err),
         {
           enableHighAccuracy: false
@@ -94,114 +58,64 @@ const Greetings = props => {
       RequestLocation();
     }
   });
-
-  if (conn) {
-    return (
-      <View
-        style={{
-          backgroundColor: "white",
-          flex: 1,
-          justifyContent: "space-evenly",
-          paddingHorizontal: 20
-        }}
-      >
-        <View>
-          <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
-            Quick
+  return (
+    <View
+      style={{
+        backgroundColor: "white",
+        flex: 1,
+        justifyContent: "space-evenly",
+        paddingHorizontal: 20
+      }}
+    >
+      <View>
+        <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
+          Quick
           </Text>
-          <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
-            and easy
+        <Text style={{ fontSize: 32, fontFamily: "OpenSans-Italic" }}>
+          and easy
           </Text>
-        </View>
-        <View>
-          <Image
-            source={require("../../Assets/Images/chat.png")}
-            style={{ width: 320, height: 280 }}
-            resizeMode="contain"
-            containerStyle={{ backgroundColor: "red" }}
-          />
-          <Text
-            style={{ fontSize: 32, fontFamily: "Roboto", textAlign: "center" }}
-          >
-            Iog App
-          </Text>
-        </View>
-
-        <View>
-          <TouchableOpacity>
-            <ButtonComp
-              onPress={() => setCurrentPos()}
-              containerStyle={{
-                alignItems: "center"
-              }}
-              title="Take me in"
-              style={{
-                width: "80%",
-                borderRadius: 20,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#189A8A"
-              }}
-              textStyle={{
-                fontSize: 16,
-                fontFamily: "Roboto",
-                color: "white"
-              }}
-            />
-          </TouchableOpacity>
-        </View>
       </View>
-    );
-  } else {
-    return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            tintColor='#189A8A'
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            title='Pull to refresh'
+      <View>
+        <Image
+          source={require("../../Assets/Images/chat.png")}
+          style={{ width: 320, height: 280 }}
+          resizeMode="contain"
+          containerStyle={{ backgroundColor: "red" }}
+        />
+        <Text
+          style={{ fontSize: 32, fontFamily: "Roboto", textAlign: "center" }}
+        >
+          Iog App
+          </Text>
+      </View>
+
+      <View>
+        <TouchableOpacity>
+          <ButtonComp
+            onPress={() => setCurrentPos()}
+            containerStyle={{
+              alignItems: "center"
+            }}
+            title="Take me in"
+            style={{
+              width: "80%",
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#189A8A"
+            }}
+            textStyle={{
+              fontSize: 16,
+              fontFamily: "Roboto",
+              color: "white"
+            }}
           />
-        }
-      >
-        <View style={styles.noConnection}>
-          <Image
-            style={{ height: 250, marginBottom: 10 }}
-            source={require('../../Assets/svg/nosignal.png')}
-            resizeMode="contain" />
-          <Text style={styles.Text}>
-            Seems like your internet is disconnected,
-          </Text>
-          <Text style={styles.Text}>
-            Try to connect your internet, then refresh this page
-          </Text>
-        </View>
-      </ScrollView >
-    );
-  }
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
-const mapStateToProps = state => ({});
 
-const mapDispatchToProps = {
-  CurentPos
-};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Greetings);
-
-const styles = StyleSheet.create({
-  noConnection: {
-    flex: 1,
-    height: Dimensions.get("window").height,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-  },
-  Text: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-});
+export default Greetings;
