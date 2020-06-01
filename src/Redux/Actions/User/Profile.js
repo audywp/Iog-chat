@@ -2,17 +2,17 @@ import database from '@react-native-firebase/database'
 import { Alert } from 'react-native'
 
 export const CreateProfile = (phone, data) => async dispatch => {
-  
+
   try {
-    await database().ref(`users/${phone}`).set({data})
+    await database().ref(`users/${phone}`).set({ data })
     dispatch({
-      type:'CREATE',
+      type: 'CREATE',
       payload: data
     })
     dispatch({
       type: 'LOADING_PROFILE'
     })
-      
+
   } catch (error) {
     dispatch({
       type: 'FAILED_LOADING'
@@ -21,25 +21,25 @@ export const CreateProfile = (phone, data) => async dispatch => {
   }
 }
 
-export const getDataProfile = (phone, callback) => async dispatch =>{
+export const getDataProfile = (phone, callback) => async dispatch => {
   try {
     await database().ref(`users/${phone}`)
-    .once('value')
-    .then(snapshot => {
-      if (snapshot.val()) {
+      .once('value')
+      .then(snapshot => {
+        if (snapshot.val()) {
+          dispatch({
+            type: 'DATA_USER',
+            payload: snapshot.val()
+          })
+          callback(true)
+        } else {
+          callback(false)
+        }
         dispatch({
           type: 'DATA_USER',
           payload: snapshot.val()
         })
-        callback(true)
-      } else {
-        callback(false)
-      }
-      dispatch({
-        type: 'DATA_USER',
-        payload: snapshot.val()
       })
-    })
     dispatch({
       type: 'LOADING_PROFILE'
     })
@@ -64,16 +64,16 @@ export const UploadPhoto = (path) => async dispatch => {
 
 export const UpdateUser = (phone, data) => async dispatch => {
   try {
-    await database().ref(`users/${phone}`).update({data}).then(() => {
+    await database().ref(`users/${phone}`).update({ data }).then(() => {
       dispatch({
-        type:'CREATE',
+        type: 'CREATE',
       })
     })
-    
+
     dispatch({
       type: 'LOADING_PROFILE'
     })
-      
+
   } catch (error) {
     dispatch({
       type: 'FAILED_LOADING'

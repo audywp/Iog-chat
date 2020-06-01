@@ -61,7 +61,6 @@ const BottomStack = props => {
   if (conn) {
     return (
       <>
-        <HeaderNav onpress={ProfileNav} />
         <BottomTabs.Navigator>
           <BottomTabs.Screen
             name="Contact"

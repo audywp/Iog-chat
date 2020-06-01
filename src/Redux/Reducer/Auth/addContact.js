@@ -1,10 +1,10 @@
 const initalState = {
   friend: [],
-  contact: [],
+  contact: {},
   isLoading: false,
 }
 
-export default function addContact (state= initalState, action) {
+export default function addContact(state = initalState, action) {
   switch (action.type) {
     case 'ADD_CONTACT':
       return {
@@ -12,7 +12,7 @@ export default function addContact (state= initalState, action) {
         isLoading: true,
         friend: action.payload
       }
-    case 'CONTACT_LOADING' : 
+    case 'CONTACT_LOADING':
       return {
         ...state,
         isLoading: false,
@@ -24,8 +24,8 @@ export default function addContact (state= initalState, action) {
         contact: action.payload
       }
     default:
-       return {
-         ...state
-        }
+      return {
+        ...state
+      }
   }
 }

@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "700325759979",
-    "firebase_url": "https://iogchat.firebaseio.com",
-    "project_id": "iogchat",
-    "storage_bucket": "iogchat.appspot.com"
+    "project_number": "116923230557",
+    "firebase_url": "https://iogchat-b5496.firebaseio.com",
+    "project_id": "iogchat-b5496",
+    "storage_bucket": "iogchat-b5496.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:700325759979:android:5ba810c32d19ba4467e7ae",
+        "mobilesdk_app_id": "1:116923230557:android:c011747c6afef176d1a0b4",
         "android_client_info": {
           "package_name": "com.iog"
         }
       },
       "oauth_client": [
         {
-          "client_id": "700325759979-rb2ue1450ha076tu26b7tl07n80jr76k.apps.googleusercontent.com",
+          "client_id": "116923230557-c828hc64sbjmjkc27g5peimd2ps3efoh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iog",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "116923230557-rcuseevof4hpde53tio0crl41tf9rpc2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDmmGqIx9Q90X51BqYAcjbKQsedPJQhnr0"
+          "current_key": "AIzaSyD7Dn4Gmpdyk-rIjHeVa1xJllmowpDbXU0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "700325759979-rb2ue1450ha076tu26b7tl07n80jr76k.apps.googleusercontent.com",
+              "client_id": "116923230557-rcuseevof4hpde53tio0crl41tf9rpc2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

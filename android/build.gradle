@@ -9,6 +9,7 @@ buildscript {
         supportLibVersion   = "28.0.0"
         playServicesVersion = "17.0.0" // or find latest version
         androidMapsUtilsVersion = "+0.5"
+        googlePlayServicesAuthVersion = "18.0.0"
     }
     repositories {
         google()
@@ -35,6 +36,7 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+        maven { url "https://maven.google.com" }
 
         google()
         jcenter()

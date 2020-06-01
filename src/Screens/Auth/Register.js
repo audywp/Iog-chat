@@ -4,12 +4,55 @@ import Button from '../../Components/Button'
 import { ScrollView } from 'react-native-gesture-handler'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
-class Login extends Component {
-  constructor (props) {
+import { connect } from 'react-redux'
+import { setRegister } from '../../Redux/Actions/Auth/Register'
+
+class Register extends Component {
+  constructor(props) {
     super(props)
+    this.state = {
+      phoneNumber: '',
+      error: false,
+      loading: false
+    }
   }
 
-  render () {
+  handleRegister = async () => {
+
+    try {
+      this.setState({
+        loading: true
+      })
+      await this.props.setRegister(this.state.phoneNumber, status => {
+        if (!status) {
+          this.props.navigation.navigate('Profile')
+        } else {
+          this.setState({
+            error: true
+          })
+        }
+      })
+    } catch (error) {
+      this.setState({ loading: false })
+    }
+  }
+
+  componentDidMount = () => {
+    if (this.state.error) {
+      this.setState({
+        loading: false
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      loading: false
+    })
+  }
+
+  render() {
+    console.log(this.state.phoneNumber)
     return (
       <ScrollView style={{ backgroundColor: 'white', flex: 1 }}>
         <View style={{ alignItems: 'center' }}>
@@ -19,37 +62,13 @@ class Login extends Component {
             resizeMode='contain'
           />
           <Text style={{ marginBottom: 20, fontSize: 26, fontFamily: 'Roboto', textAlign: 'center' }}> Registration </Text>
-          <Text style={{ fontSize: 14, fontFamily: 'Roboto', textAlign: 'center' }}> Enter your name and phone number, and create </Text>
-          <Text style={{ fontSize: 14, fontFamily: 'Roboto', textAlign: 'center' }}> you SecurityCode to verify later </Text>
+          <Text style={{ fontSize: 14, fontFamily: 'Roboto', textAlign: 'center' }}> Enter your, phone number</Text>
+          <Text style={{ fontSize: 14, fontFamily: 'Roboto', textAlign: 'center' }}></Text>
+          <Text style={{ fontSize: 14, fontFamily: 'Roboto', textAlign: 'center' }}> This season does'nt require verification </Text>
         </View>
         <View style={styles.bottomContainer}>
-        <View style={styles.inputText}>
-          <Text
-              style={{
-                position: 'absolute',
-                left: 17,
-                top: 20
-              }}
-            >
-              <AntDesign name='user' size={20} /> :
-            </Text>
-          <TextInput
-             placeholder='Username'
-             placeholderTextColor='#333'
-             onChangeText={ phone => this.setState({ phoneNumb: `+62${phone}` })}
-             style={{
-               paddingHorizontal: 50,
-               marginTop: 10,
-               borderBottomWidth: 2,
-               borderColor: '#189A8A',
-               width: 230,
-               height: 40,
-               marginLeft: 5,
-             }}
-           />
-           </View>
-           
-           <View style={styles.inputText}>
+
+          <View style={styles.inputText}>
             <Text
               style={{
                 position: 'absolute',
@@ -64,7 +83,7 @@ class Login extends Component {
               maxLength={11}
               placeholder='Phone Number'
               placeholderTextColor='#333'
-              onChangeText={ phone => this.setState({ phoneNumb: `+62${phone}` })}
+              onChangeText={phone => this.setState({ phoneNumber: `+62${phone}` })}
               style={{
                 paddingHorizontal: 50,
                 borderRadius: 8,
@@ -72,12 +91,21 @@ class Login extends Component {
                 borderColor: '#189A8A',
                 width: 230,
                 height: 40,
-                marginLeft: 5
+                marginLeft: 5,
               }}
             />
           </View>
+          <View style={{
+            marginBottom: 40
+          }}>
+            {this.state.error ? <Text style={{
+              color: 'red'
+            }}>Your phone number is already taken </Text> : null}
+          </View>
           <Button
             title='Continue'
+            onPress={this.handleRegister}
+            loading={this.state.loading}
             containerStyle={{
               justifyContent: 'center',
               alignItems: 'center',
@@ -97,7 +125,15 @@ class Login extends Component {
   }
 }
 
-export default Login
+const mapStateToProps = (state) => ({
+
+})
+
+const mapDispatchToProps = {
+  setRegister
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register)
 
 const styles = StyleSheet.create({
   bottomContainer: {
@@ -110,6 +146,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 15
+    marginTop: 30
   }
 })

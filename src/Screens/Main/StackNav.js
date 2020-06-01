@@ -37,11 +37,18 @@ export default connect(
                 headerShown: false,
               }}
             />
-            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="Profile" component={Profile} options={{
+              headerTintColor: 'white',
+              headerStyle: { backgroundColor: '#189A8A' }
+            }} />
             <Stack.Screen
               name="Chat"
               component={ChatScreen}
-              headerBackground="#189A8A"
+              options={{
+                headerShown: false,
+                headerTintColor: 'white',
+                headerStyle: { backgroundColor: '#189A8A' }
+              }}
             />
           </Stack.Navigator>
         );

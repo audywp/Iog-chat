@@ -1,17 +1,17 @@
 const initalState = {
-  data: [],
+  phone: null,
   isLoading: false,
   isRegisted: false
 }
 
-export default function Register (state= initalState, action) {
+export default function Register(state = initalState, action) {
   switch (action.type) {
     case 'IS_REGISTER':
       return {
         ...state,
         isLoading: true,
         isRegisted: true,
-        data: action.payload
+        phone: action.payload
       }
     case 'REGISTER_LOADING':
       return {
@@ -28,6 +28,6 @@ export default function Register (state= initalState, action) {
         ...state
       }
     default:
-      return state 
+      return state
   }
 }

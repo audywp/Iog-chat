@@ -1,5 +1,5 @@
 const initialState = {
-  user: [],
+  user: null,
   message: [],
   path: [],
   curentPos: [],
@@ -13,7 +13,6 @@ export default function Profile(state = initialState, action) {
     case 'CREATE':
       return {
         ...state,
-        user: [],
         isLoading: true
       }
     case 'DATA_USER':

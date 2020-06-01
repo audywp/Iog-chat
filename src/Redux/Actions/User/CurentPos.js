@@ -10,7 +10,7 @@ export const getDataUser = () => dispatch => {
         console.log(snapshot.val())
         console.log('hahaha', current_user);
         const data = snapshot.val();
-        const user = Object.values(data);
+        const user = !snapshot.val() ? snapshot.val() : Object.values(data);
         dispatch({
           type: 'CURENT_POS',
           payload: user

@@ -1,14 +1,25 @@
 import React, { Component } from 'react'
-import { View, Text, Image, SafeAreaView, StyleSheet, TextInput, Alert, AsyncStorage } from 'react-native'
+import { View, Text, Image, ScrollView, StyleSheet, TextInput, Alert } from 'react-native'
 import Button from '../../Components/Button'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import auth from '@react-native-firebase/auth'
 import { connect } from 'react-redux'
-import { onLogin } from '../../Redux/Actions/Auth/Login'
+import { onLogin, loginWithGoogle } from '../../Redux/Actions/Auth/Login'
 import { Spinner } from 'native-base'
+import LoadingScreen from '../../Components/LoadingScreen'
+import { GoogleSigninButton, GoogleSignin, statusCodes } from '@react-native-community/google-signin'
+import { LoginButton } from 'react-native-fbsdk'
+
+GoogleSignin.configure({
+  webClientId: '116923230557-rcuseevof4hpde53tio0crl41tf9rpc2.apps.googleusercontent.com',
+  offlineAccess: true,
+  hostedDomain: '',
+  loginHint: '',
+  forceCodeForRefreshToken: true,
+  accountName: '',
+});
 
 class Login extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       user: null,
@@ -16,36 +27,9 @@ class Login extends Component {
       phoneNumb: '',
       confirm: null,
       code: '',
-      loading: false
+      loading: false,
+      loadingScreen: false
     }
-  }
-
-  componentDidMount () {
-    this.unsubscribe = auth().onAuthStateChanged(user => {
-      console.log(this.unsubscribe)
-      if (user) {
-        this.setState({
-          user: user.toJSON()
-        })
-      } else {
-        this.setState({
-          user: null,
-          message: '',
-          phoneNumb: '',
-          confirm: null,
-          code: '',
-        })
-      }
-    })
-  }
-
-  componentWillUnmount () {
-    if (this.unsubscribe) {
-      this.unsubscribe()
-    }
-    this.setState({
-      loading: false
-    })
   }
 
   onLogin = async () => {
@@ -62,17 +46,55 @@ class Login extends Component {
     try {
       await this.props.onLogin(phoneNumb).then(() => {
         this.props.navigation.navigate('OTP')
-      }) 
+      })
     } catch (error) {
       console.log(error)
     }
-    
   }
 
-  render () {
+  googleSignin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const { idToken } = await GoogleSignin.signIn()
+      this.setState({
+        loadingScreen: true
+      })
+      this.props.loginWithGoogle(idToken, status => {
+        if (!status) {
+          this.props.navigation.navigate('Register')
+        } else {
+          console.log('success login')
+        }
+      })
+      this.setState({
+        loadingScreen: false
+      })
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        this.setState({
+          loadingScreen: false
+        })
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        this.setState({
+          loadingScreen: true
+        })
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert('Seems like your Services is time-out, try again')
+        this.setState({
+          loadingScreen: false
+        })
+      } else {
+        console.log(error)
+      }
+    }
+
+  };
+
+  render() {
     console.log(this.props.login.isLoading)
     return (
       <ScrollView style={{ backgroundColor: 'white', flex: 1 }}>
+        {this.state.loadingScreen ? <LoadingScreen /> : null}
         <View style={{ alignItems: 'center' }}>
           <Image
             source={require('../../Assets/Images/login.png')}
@@ -99,7 +121,7 @@ class Login extends Component {
               maxLength={11}
               placeholder='Phone Number'
               placeholderTextColor='#333'
-              onChangeText={ phone => this.setState({ phoneNumb: `+62${phone}` })}
+              onChangeText={phone => this.setState({ phoneNumb: `+62${phone}` })}
               style={{
                 paddingHorizontal: 50,
                 borderRadius: 8,
@@ -129,30 +151,43 @@ class Login extends Component {
               textStyle={{ textAlign: 'center', color: 'white', flex: 1 }}
             />
           </View>
-          <Text style= {{ marginTop: 10, marginBottom: 5 }}>
-            Didn't have account ?
+          <Text style={{ marginTop: 10, marginBottom: 5 }}>
+            Or
           </Text>
-          <TouchableOpacity onPress={()=> this.props.navigation.navigate('Register')}>
-          <Text style= {{ color: '#189A8A' }}>
-            Register
-          </Text>
-          </TouchableOpacity>
+
         </View>
         <View />
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <View style={styles.signinMethod}>
+
+            <GoogleSigninButton
+              style={{
+                width: 240
+              }}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={(() => this.googleSignin().then(() => console.log('Sign in goggle')))}
+            />
+          </View>
+        </View>
       </ScrollView>
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-    login: state.isLogin
+  login: state.isLogin
 })
 
 const mapDispatchToProps = {
-  onLogin
+  onLogin, loginWithGoogle
 }
 
-export default connect(mapStateToProps, mapDispatchToProps) (Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)
 
 const styles = StyleSheet.create({
   bottomContainer: {
@@ -167,5 +202,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15
+  },
+  signinMethod: {
+    marginTop: -10,
+    width: '60%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center'
   }
 })
